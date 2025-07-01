@@ -83,8 +83,19 @@ async def verify_user_account(
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    await user_service.update_user(user, {'is_verified': True}, session)
-    return {"message": "Account verified successfully."}
+    await user_service.update_user(user, {
+        'is_verified': True,
+    }, session)
+
+    reset_password_link = f"http://{Config.DOMAIN}/alumniDB/v1/user/auth/password-reset-confirm/{token}"
+
+    return {
+        "message": "Account verified successfully. Please set your new password.",
+        "set_password_link": reset_password_link
+    }
+
+
+
 
 
 @auth_router.post('/login')
@@ -204,6 +215,8 @@ async def reset_password(
         raise HTTPException(status_code=404, detail="User not found.")
 
     passwd_hash = generate_password_hash(passwords.new_password)
-    await user_service.update_user(user, {'password': passwd_hash}, session)
+    await user_service.update_user(user, {'password': passwd_hash,
+        'must_change_password': True},
+          session)
 
-    return {"message": "Password reset successfully."}
+    return {"message": "Password reset successfully."}  

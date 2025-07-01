@@ -13,3 +13,4 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     is_verified = Column(Boolean, default=False)
+    must_change_password = Column(Boolean, default=False)
